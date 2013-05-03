@@ -5,7 +5,7 @@
   var config = {
     // Ensure Content-Type is an image before trying to load @2x image
     // https://github.com/imulus/retinajs/pull/45)
-    check_mime_type: true
+    check_mime_type: false
   };
 
 
@@ -51,17 +51,13 @@
 
 
   root.RetinaImagePath = RetinaImagePath;
-
-  function RetinaImagePath(path, at_2x_path) {
+function RetinaImagePath(path, at_2x_path) {
     this.path = path;
-    if (typeof at_2x_path !== "undefined" && at_2x_path !== null) {
-      this.at_2x_path = at_2x_path;
+    this.at_2x_path = at_2x_path;
       this.perform_check = false;
-    } else {
-      this.at_2x_path = path.replace(/\.\w+$/, function(match) { return "@2x" + match; });
-      this.perform_check = true;
-    }
+    
   }
+ 
 
   RetinaImagePath.confirmed_paths = [];
 
@@ -69,49 +65,12 @@
     return !!(this.path.match(/^https?\:/i) && !this.path.match('//' + document.domain) )
   }
 
-  RetinaImagePath.prototype.check_2x_variant = function(callback) {
-    var http, that = this;
-    if (this.is_external()) {
-      return callback(false);
-    } else if (!this.perform_check && typeof this.at_2x_path !== "undefined" && this.at_2x_path !== null) {
-      return callback(true);
-    } else if (this.at_2x_path in RetinaImagePath.confirmed_paths) {
-      return callback(true);
-    } else {
-      http = new XMLHttpRequest;
-      http.open('HEAD', this.at_2x_path);
-      http.onreadystatechange = function() {
-        if (http.readyState != 4) {
-          return callback(false);
-        }
-
-        if (http.status >= 200 && http.status <= 399) {
-          if (config.check_mime_type) {
-            var type = http.getResponseHeader('Content-Type');
-            if (type == null || !type.match(/^image/i)) {
-              return callback(false);
-            }
-          }
-
-          RetinaImagePath.confirmed_paths.push(that.at_2x_path);
-          return callback(true);
-        } else {
-          return callback(false);
-        }
-      }
-      http.send();
-    }
-  }
-
-
-
   function RetinaImage(el) {
     this.el = el;
     this.path = new RetinaImagePath(this.el.getAttribute('src'), this.el.getAttribute('data-at2x'));
     var that = this;
-    this.path.check_2x_variant(function(hasVariant) {
-      if (hasVariant) that.swap();
-    });
+     that.swap();
+    
   }
 
   root.RetinaImage = RetinaImage;
