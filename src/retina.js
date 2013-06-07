@@ -67,26 +67,29 @@ function RetinaImagePath(path, at_2x_path) {
 
   function RetinaImage(el) {
     this.el = el;
-    this.path = new RetinaImagePath(this.el.getAttribute('src'), this.el.getAttribute('data-at2x'));
-    var that = this;
-     that.swap();
+  if(this.el.getAttribute('data-at2x')!=null){
+    	this.path = new RetinaImagePath(this.el.getAttribute('src'), this.el.getAttribute('data-at2x'));
+    	var that = this;
+     	that.swap();
+		}
     
   }
 
   root.RetinaImage = RetinaImage;
 
   RetinaImage.prototype.swap = function(path) {
-    if (typeof path == 'undefined') path = this.path.at_2x_path;
-
-    var that = this;
+    if (typeof path == 'undefined'){
+		 path = this.path.at_2x_path;
+		}
+	 var that = this;
     function load() {
       if (! that.el.complete) {
         setTimeout(load, 5);
       } else {
-        that.el.setAttribute('width', that.el.offsetWidth);
+		that.el.setAttribute('width', that.el.offsetWidth);
         that.el.setAttribute('height', that.el.offsetHeight);
         that.el.setAttribute('src', path);
-      }
+		}
     }
     load();
   }
@@ -94,7 +97,7 @@ function RetinaImagePath(path, at_2x_path) {
 
 
 
-  if (Retina.isRetina()) {
+  if (Retina.isRetina()||true) {
     Retina.init(root);
   }
 
