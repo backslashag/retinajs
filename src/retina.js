@@ -97,7 +97,7 @@ function RetinaImagePath(path, at_2x_path) {
 
 
 
-  if (Retina.isRetina()||true) {
+  if (Retina.isRetina()) {
     Retina.init(root);
   }
 
